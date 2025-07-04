@@ -125,6 +125,10 @@ def main():
     print(f"Test Loss: {loss}")
     print(f"Test Accuracy: {accuracy}")
 
+    #Save the trained model
+    cnn_model.save("models/model_cnn.h5")
+    print("Model saved as model_cnn.h5")
+
     # Plot training and validation accuracy
     plt.plot(history.history['accuracy'], label='Training Accuracy')
     plt.plot(history.history['val_accuracy'], label='Validation Accuracy')

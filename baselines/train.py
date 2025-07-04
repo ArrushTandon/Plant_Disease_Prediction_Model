@@ -1,10 +1,12 @@
 import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..","src")))
 import numpy as np
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
-from lbp_feature_extraction import extract_lbp_features
-from cnn_model import build_model
-from eho_optimization import eho_feature_selection
+from utils.visualize import extract_lbp_features
+from models.cnn_model import build_model
+from optimization.eho import eho_feature_selection
 
 # Define paths
 data_dir = "data/processed/"

@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import cv2
+import pickle
 import time
 from skimage.feature import local_binary_pattern
 from sklearn.model_selection import train_test_split
@@ -160,6 +161,15 @@ def main():
     selected_features_mask = eho_feature_selection(X_train_pca, y_train, fitness_function)
     X_train_selected = X_train_pca[:, selected_features_mask]
     X_test_selected = X_test_pca[:, selected_features_mask]
+
+    # Save PCA
+    with open("models/pca.pkl", "wb") as f:
+        pickle.dump(pca, f)
+    print("✅ PCA saved to models/pca.pkl")
+
+    # Save EHO-selected feature mask
+    np.save("models/mask.npy", selected_features_mask)
+    print("✅ EHO feature mask saved to models/mask.npy")
 
     # Apply SMOTE to balance the dataset
     smote = SMOTE(random_state=42)

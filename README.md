@@ -16,32 +16,37 @@ This project is a hybrid deep learning and machine learning pipeline for detecti
 
 ## 📁 Folder Structure
 ```
-PlantDiseaseDetection/
+Plant_Disease_Prediction/
 │
 ├── README.md
 ├── requirements.txt
-│
-├── src/
-│   ├── cnn_eho_gpu_updated.py           # Main pipeline
-│   ├── models/
-│   │   └── cnn_model.py                 # Fully connected model
-│   ├── optimization/
-│   │   └── eho_optimization.py          # EHO feature selector
-│   └── utils/
-│       ├── visualize.py                 # Histogram
-│       └── lbp_feature_extraction.py    # LBP feature extraction
-│
-├── scripts/
-│   └── data_preparation.py         # Organizes dataset into healthy/diseased
+├── LICENSE
 │
 ├── baselines/
-│   ├── train_cnn.py                # Simple CNN training script
-│   └── train.py                    # LBP + EHO baseline
+│   ├── train.py              # LBP + MLP baseline
+│   └── train_cnn.py         # Basic CNN classifier
+│
+├── data/
+│   └── processed/
+│       ├── healthy/         # Preprocessed healthy leaf images
+│       └── diseased/        # Preprocessed diseased leaf images
+│
+├── scripts/
+│   └── data_preparation.py  # Preprocessing & dataset splitting
+│
+├── src/
+│   ├── models/
+│   │   └── cnn_model.py     # FC model architecture
+│   ├── optimization/
+│   │   └── eho_optimization.py # EHO logic
+│   └── utils/
+│       └── visualize.py     # LBP histogram visualization
 │
 ├── experiments/
-│   ├── convergence_curves.py       # Accuracy/Loss/Fitness analysis
-│   └── cnn_eho_gpu.py              # Legacy version of main pipeline
+│   ├── convergence_curves.py  # Fitness & accuracy tracking
+│   └── cnn_eho_gpu.py         # Earlier prototype
 ```
+
 
 ---
 
