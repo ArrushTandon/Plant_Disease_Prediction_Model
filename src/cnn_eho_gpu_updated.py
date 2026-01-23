@@ -148,6 +148,9 @@ def main():
     print("Extracting features from test set...")  # Debug statement
     X_test_features = cnn_model.predict(X_test, batch_size=32, verbose=1)  # Verbose output
 
+    #cnn_model.save("models/cnn_feature_extractor.h5")
+    #print("CNN feature extractor saved to models/cnn_feature_extractor.h5")
+
     # Concatenate CNN and LBP features
     X_train_combined = np.hstack((X_train_features, X_train_lbp))
     X_test_combined = np.hstack((X_test_features, X_test_lbp))
@@ -163,13 +166,13 @@ def main():
     X_test_selected = X_test_pca[:, selected_features_mask]
 
     # Save PCA
-    with open("models/pca.pkl", "wb") as f:
-        pickle.dump(pca, f)
-    print("✅ PCA saved to models/pca.pkl")
+    #with open("models/pca.pkl", "wb") as f:
+    #    pickle.dump(pca, f)
+    #print("PCA saved to models/pca.pkl")
 
     # Save EHO-selected feature mask
-    np.save("models/mask.npy", selected_features_mask)
-    print("✅ EHO feature mask saved to models/mask.npy")
+    #np.save("models/mask.npy", selected_features_mask)
+    #print("EHO feature mask saved to models/mask.npy")
 
     # Apply SMOTE to balance the dataset
     smote = SMOTE(random_state=42)
@@ -185,6 +188,10 @@ def main():
         X_train_resampled, y_train_resampled, epochs=20, validation_data=(X_test_selected, y_test),
         class_weight=class_weights, batch_size=32
     )
+
+    # Save final classifier
+    #final_model.save("models/model_cnn.h5")
+    #print("Final classifier saved to models/model_cnn.h5")
 
     # Adjust decision threshold to improve precision for the healthy class
     y_pred_proba = final_model.predict(X_test_selected)

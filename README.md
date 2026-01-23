@@ -23,28 +23,30 @@ Plant_Disease_Prediction/
 ├── LICENSE
 │
 ├── baselines/
-│   ├── train.py              # LBP + MLP baseline
-│   └── train_cnn.py         # Basic CNN classifier
+│   ├── train.py                        # LBP + MLP baseline
+│   └── train_cnn.py                    # Basic CNN classifier
 │
 ├── data/
 │   └── processed/
-│       ├── healthy/         # Preprocessed healthy leaf images
-│       └── diseased/        # Preprocessed diseased leaf images
+│       ├── healthy/                    # Preprocessed healthy leaf images
+│       └── diseased/                   # Preprocessed diseased leaf images
 │
 ├── scripts/
-│   └── data_preparation.py  # Preprocessing & dataset splitting
+│   └── data_preparation.py             # Preprocessing & dataset splitting
 │
 ├── src/
 │   ├── models/
-│   │   └── cnn_model.py     # FC model architecture
+│   │   └── cnn_model.py                # CNN Base model architecture
 │   ├── optimization/
-│   │   └── eho_optimization.py # EHO logic
-│   └── utils/
-│       └── visualize.py     # LBP histogram visualization
+│   │   └── eho_optimization.py         # EHO logic
+│   ├── utils/
+│   │    ├── visualize.py               # LBP histogram visualization
+│   │    └── lbp_feature_extraction.py  # LBP Feature Extraction
+│   └── cnn_eho_gpu_updated             # Main File
 │
 ├── experiments/
-│   ├── convergence_curves.py  # Fitness & accuracy tracking
-│   └── cnn_eho_gpu.py         # Earlier prototype
+│   ├── convergence_curves.py           # Fitness & accuracy tracking
+│   └── cnn_eho_gpu.py                  # Earlier prototype
 ```
 
 
@@ -85,12 +87,12 @@ Uses the [PlantVillage dataset](https://www.kaggle.com/datasets/emmarex/plantdis
 ---
 
 ## 📈 Results
-| Metric           | Value (example) |
-|------------------|-----------------|
-| Accuracy         | 96.3%           |
-| Precision (Healthy) | 95.2%       |
-| Recall (Diseased)  | 97.8%         |
-| ROC-AUC          | 0.98            |
+| Metric              | Value (example) |
+|---------------------|-----------------|
+| Accuracy            | 96.3%           |
+| Precision (Healthy) | 95.2%           |
+| Recall (Diseased)   | 97.8%           |
+| ROC-AUC             | 0.98            |
 
 Includes:
 - Confusion Matrix
