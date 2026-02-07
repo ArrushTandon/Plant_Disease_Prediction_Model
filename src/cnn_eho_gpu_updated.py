@@ -195,6 +195,10 @@ def main():
 
     # Adjust decision threshold to improve precision for the healthy class
     y_pred_proba = final_model.predict(X_test_selected)
+
+    np.save("roc_ytrue.npy", y_test)
+    np.save("roc_eho.npy", y_pred_proba.flatten())
+
     precision, recall, thresholds = precision_recall_curve(y_test, y_pred_proba)
     f1_scores = 2 * (precision * recall) / (precision + recall)
     optimal_threshold = thresholds[np.argmax(f1_scores)]
