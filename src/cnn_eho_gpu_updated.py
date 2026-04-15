@@ -146,8 +146,8 @@ def main():
     X_test_features = feature_extractor.predict(X_test)
 
     # Save CNN
-    feature_extractor.save("models/cnn_feature_extractor.keras", save_format="keras")
-    print("CNN feature extractor saved to models/cnn_feature_extractor.keras")
+    feature_extractor.save("models/cnn_feature_extractor.h5")
+    print("CNN feature extractor saved to models/cnn_feature_extractor.h5")
 
     # Concatenate CNN and LBP features
     X_train_combined = np.hstack((X_train_features, X_train_lbp))
@@ -188,16 +188,8 @@ def main():
     )
 
     # Save final classifier
-    final_model.save("models/model_cnn.keras", save_format="keras")
-    print("Final classifier saved to models/model_cnn.keras")
-
-    #testing final model
-    final_model.summary()
-    print("Weights:", len(final_model.weights))
-    import tensorflow as tf
-    test_model = tf.keras.models.load_model("models/model_cnn.keras")
-    print("Reload success")
-    print("Reload weights:", len(test_model.weights))
+    final_model.save("models/model_cnn.h5")
+    print("Final classifier saved to models/model_cnn.h5")
 
     # Adjust decision threshold to improve precision for the healthy class
     y_pred_proba = final_model.predict(X_test_selected)
