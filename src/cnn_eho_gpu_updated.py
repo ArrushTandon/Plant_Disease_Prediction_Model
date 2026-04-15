@@ -15,6 +15,7 @@ from tensorflow.keras.mixed_precision import set_global_policy
 from imblearn.over_sampling import SMOTE
 import seaborn as sns
 import matplotlib.pyplot as plt
+from tensorflow.keras import regularizers
 
 # Enable mixed precision for faster training on GPU
 set_global_policy('float32')
@@ -112,9 +113,9 @@ def fitness_function(features, y_train):
 def build_final_model(input_shape):
     model = models.Sequential([
         layers.Input(shape=input_shape),
-        layers.Dense(128, activation='relu', kernel_regularizer='l2'),
+        layers.Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.001)),
         layers.Dropout(0.5),
-        layers.Dense(64, activation='relu', kernel_regularizer='l2'),
+        layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001)),
         layers.Dropout(0.5),
         layers.Dense(1, activation='sigmoid', dtype='float32')
     ])
@@ -189,6 +190,14 @@ def main():
     # Save final classifier
     final_model.save("models/model_cnn.keras", save_format="keras")
     print("Final classifier saved to models/model_cnn.keras")
+
+    #testing final model
+    final_model.summary()
+    print("Weights:", len(final_model.weights))
+    import tensorflow as tf
+    test_model = tf.keras.models.load_model("models/model_cnn.keras")
+    print("Reload success")
+    print("Reload weights:", len(test_model.weights))
 
     # Adjust decision threshold to improve precision for the healthy class
     y_pred_proba = final_model.predict(X_test_selected)
