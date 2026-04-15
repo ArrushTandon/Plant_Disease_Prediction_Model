@@ -17,7 +17,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Enable mixed precision for faster training on GPU
-set_global_policy('mixed_float16')
+set_global_policy('float32')
 
 # Function to compute LBP features
 def compute_lbp(image, P=8, R=1):
@@ -60,16 +60,17 @@ def load_dataset(data_dir, categories, target_size=(128, 128)):
     return np.array(images), np.array(lbp_features), np.array(labels)
 
 # CNN model
-def build_cnn(input_shape):
+def build_cnn_classifier(input_shape):
     model = models.Sequential([
-        layers.Input(shape=input_shape),  # Add Input layer
-        layers.Conv2D(32, (3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, (3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(128, (3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Flatten()
+        layers.Input(shape=input_shape),
+        layers.Conv2D(32, 3, activation='relu'),
+        layers.MaxPooling2D(),
+        layers.Conv2D(64, 3, activation='relu'),
+        layers.MaxPooling2D(),
+        layers.Conv2D(128, 3, activation='relu'),
+        layers.MaxPooling2D(),
+        layers.Flatten(),
+        layers.Dense(64, activation='relu', name='feature_layer')
     ])
     return model
 
@@ -129,34 +130,30 @@ def main():
         images, lbp_features, labels, test_size=0.2, random_state=42
     )
 
-    # Data augmentation
-    datagen = ImageDataGenerator(
-        rotation_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True,
-        fill_mode='nearest'
-    )
-    datagen.fit(X_train)
-
     # CNN for feature extraction
-    cnn_model = build_cnn((128, 128, 1))
-    print("Extracting features from training set...")  # Debug statement
-    X_train_features = cnn_model.predict(X_train, batch_size=32, verbose=1)  # Verbose output
-    print("Extracting features from test set...")  # Debug statement
-    X_test_features = cnn_model.predict(X_test, batch_size=32, verbose=1)  # Verbose output
+    cnn_model = build_cnn_classifier((128, 128, 1))
+    cnn_model.compile(optimizer='adam', loss='mse')
 
-    #cnn_model.save("models/cnn_feature_extractor.h5")
-    #print("CNN feature extractor saved to models/cnn_feature_extractor.h5")
+    cnn_model.fit(X_train, y_train, epochs=10, validation_data=(X_test, y_test))
+
+    feature_extractor = models.Model(
+        inputs=cnn_model.input,
+        outputs=cnn_model.get_layer('feature_layer').output
+    )
+
+    X_train_features = feature_extractor.predict(X_train)
+    X_test_features = feature_extractor.predict(X_test)
+
+    # Save CNN
+    feature_extractor.save("models/cnn_feature_extractor.keras")
+    print("CNN feature extractor saved to models/cnn_feature_extractor.keras")
 
     # Concatenate CNN and LBP features
     X_train_combined = np.hstack((X_train_features, X_train_lbp))
     X_test_combined = np.hstack((X_test_features, X_test_lbp))
 
     # Use PCA for dimensionality reduction
-    pca = PCA(n_components=50)  # Reduce to 50 components
+    pca = PCA(n_components=30)
     X_train_pca = pca.fit_transform(X_train_combined)
     X_test_pca = pca.transform(X_test_combined)
 
@@ -166,13 +163,13 @@ def main():
     X_test_selected = X_test_pca[:, selected_features_mask]
 
     # Save PCA
-    #with open("models/pca.pkl", "wb") as f:
-    #    pickle.dump(pca, f)
-    #print("PCA saved to models/pca.pkl")
+    with open("models/pca.pkl", "wb") as f:
+        pickle.dump(pca, f)
+    print("PCA saved to models/pca.pkl")
 
     # Save EHO-selected feature mask
-    #np.save("models/mask.npy", selected_features_mask)
-    #print("EHO feature mask saved to models/mask.npy")
+    np.save("models/mask.npy", selected_features_mask)
+    print("EHO feature mask saved to models/mask.npy")
 
     # Apply SMOTE to balance the dataset
     smote = SMOTE(random_state=42)
@@ -190,8 +187,8 @@ def main():
     )
 
     # Save final classifier
-    #final_model.save("models/model_cnn.h5")
-    #print("Final classifier saved to models/model_cnn.h5")
+    final_model.save("models/model_cnn.keras")
+    print("Final classifier saved to models/model_cnn.keras")
 
     # Adjust decision threshold to improve precision for the healthy class
     y_pred_proba = final_model.predict(X_test_selected)
@@ -203,6 +200,8 @@ def main():
     f1_scores = 2 * (precision * recall) / (precision + recall)
     optimal_threshold = thresholds[np.argmax(f1_scores)]
     y_pred = (y_pred_proba > optimal_threshold).astype(int)
+
+    np.save("models/threshold.npy", optimal_threshold)
 
     # Evaluate the model
     loss, accuracy = final_model.evaluate(X_test_selected, y_test)
