@@ -145,7 +145,7 @@ def main():
     X_test_features = feature_extractor.predict(X_test)
 
     # Save CNN
-    feature_extractor.save("models/cnn_feature_extractor.keras")
+    feature_extractor.save("models/cnn_feature_extractor.keras", save_format="keras")
     print("CNN feature extractor saved to models/cnn_feature_extractor.keras")
 
     # Concatenate CNN and LBP features
@@ -187,7 +187,7 @@ def main():
     )
 
     # Save final classifier
-    final_model.save("models/model_cnn.keras")
+    final_model.save("models/model_cnn.keras", save_format="keras")
     print("Final classifier saved to models/model_cnn.keras")
 
     # Adjust decision threshold to improve precision for the healthy class
